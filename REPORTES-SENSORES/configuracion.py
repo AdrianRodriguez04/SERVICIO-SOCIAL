@@ -3,8 +3,8 @@
 # ============================================================
 
 # --- Telegram ---
-TELEGRAM_TOKEN   = "8707579631:AAGAsPDbN19y_ypB8pmuWDvxFpxtE_WD28c" 
-TELEGRAM_CHAT_ID = "5287582092"    
+TELEGRAM_TOKEN   = "" #Borrado por seguridad 
+TELEGRAM_CHAT_ID = "" #Borrado ṕor seguridad
 
 # --- Prometheus ---
 PROMETHEUS_URL = "http://localhost:9090" 
