@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard de Sensores DHT22</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0f;
+      color: #e2e4e9;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #111118;
+      border-bottom: 1px solid #1e1e2e;
+      padding: 0 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      gap: 10px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .logo-icon {
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+    }
+
+    .header-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #f1f5f9;
+      white-space: nowrap;
+    }
+
+    .header-subtitle {
+      font-size: 11px;
+      color: #4b5563;
+      margin-top: 1px;
+      white-space: nowrap;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .time-label {
+      font-size: 13px;
+      color: #4b5563;
+      white-space: nowrap;
+    }
+
+    select {
+      font-size: 13px;
+      font-family: inherit;
+      padding: 6px 10px;
+      border: 1px solid #2a2a3a;
+      border-radius: 8px;
+      background: #1a1a26;
+      color: #e2e4e9;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s;
+      max-width: 160px;
+    }
+
+    select:hover { border-color: #3a3a4e; }
+    select:focus { border-color: #f46800; box-shadow: 0 0 0 3px rgba(244,104,0,0.15); }
+
+    .refresh-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-family: inherit;
+      padding: 6px 12px;
+      border: 1px solid #2a2a3a;
+      border-radius: 8px;
+      background: #1a1a26;
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    .refresh-btn:hover { background: #22223a; border-color: #3a3a4e; }
+    .refresh-btn:active { background: #2a2a40; }
+    .refresh-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+    @media (max-width: 480px) {
+      .time-label { display: none; }
+      .btn-text { display: none; }
+      .header-subtitle { display: none; }
+      .refresh-btn { padding: 6px 8px; }
+      select { max-width: 130px; font-size: 12px; }
+    }
+
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 1.25rem 0.875rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .panel-card {
+      width: 100%;
+      background: #111118;
+      border: 1px solid #1e1e2e;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+
+    .panel-card:hover { border-color: #2e2e42; }
+
+    .panel-body {
+      display: flex;
+      justify-content: center;
+    }
+
+    .panel-body iframe {
+      display: block;
+      width: 100%;
+      height: clamp(240px, 40vw, 400px);
+      border: none;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-top: 1px solid #1a1a28;
+      background: #0e0e18;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #f46800;
+      animation: pulse 2.5s infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.25; }
+    }
+
+    .status-text {
+      font-size: 11px;
+      color: #374151;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <svg class="logo-icon" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="34" height="34" rx="8" fill="#1a1a26"/>
+      <rect width="34" height="34" rx="8" fill="#f46800" fill-opacity="0.12"/>
+      <circle cx="17" cy="17" r="11" stroke="#f46800" stroke-width="1.5" stroke-dasharray="50 20" stroke-linecap="round" opacity="0.5"/>
+      <polyline points="8,20 11,15 14,18 17,11 20,16 23,13 26,17" stroke="#f46800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="17" cy="11" r="1.5" fill="#f46800"/>
+      <circle cx="23" cy="13" r="1.5" fill="#f46800" opacity="0.7"/>
+    </svg>
+    <div>
+      <div class="header-title">Sensores DHT22</div>
+      <div class="header-subtitle">Red ESP32-C3 &amp; NodeMCU v3</div>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <span class="time-label">Rango:</span>
+    <select id="timeRange" onchange="updatePanels()">
+      <option value="now-15m">Últimos 15 min</option>
+      <option value="now-30m">Últimos 30 min</option>
+      <option value="now-1h" selected>Última hora</option>
+      <option value="now-3h">Últimas 3 horas</option>
+      <option value="now-6h">Últimas 6 horas</option>
+      <option value="now-12h">Últimas 12 horas</option>
+      <option value="now-24h">Últimas 24 horas</option>
+      <option value="now-2d">Últimos 2 días</option>
+      <option value="now-7d">Última semana</option>
+    </select>
+    <button class="refresh-btn" onclick="updatePanels()">
+      <svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.65 2.35A8 8 0 1 0 15 8h-2a6 6 0 1 1-1.17-3.59L10 6h5V1l-1.35 1.35z"/></svg>
+      <span class="btn-text">Actualizar</span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <div class="panel-card">
+    <div class="panel-body"><iframe id="p7" src="" title="Panel 7"></iframe></div>
+    <div class="status-bar"><div class="status-dot"></div><span class="status-text">En vivo</span></div>
+  </div>
+
+  <div class="panel-card">
+    <div class="panel-body"><iframe id="p8" src="" title="Panel 8"></iframe></div>
+    <div class="status-bar"><div class="status-dot"></div><span class="status-text">En vivo</span></div>
+  </div>
+
+  <div class="panel-card">
+    <div class="panel-body"><iframe id="p4" src="" title="Panel 4"></iframe></div>
+    <div class="status-bar"><div class="status-dot"></div><span class="status-text">En vivo</span></div>
+  </div>
+
+  <div class="panel-card">
+    <div class="panel-body"><iframe id="p5" src="" title="Panel 5"></iframe></div>
+    <div class="status-bar"><div class="status-dot"></div><span class="status-text">En vivo</span></div>
+  </div>
+
+  <div class="panel-card">
+    <div class="panel-body"><iframe id="p3" src="" title="Panel 3"></iframe></div>
+    <div class="status-bar"><div class="status-dot"></div><span class="status-text">En vivo</span></div>
+  </div>
+
+  <div class="panel-card">
+    <div class="panel-body"><iframe id="p6" src="" title="Panel 6"></iframe></div>
+    <div class="status-bar"><div class="status-dot"></div><span class="status-text">En vivo</span></div>
+  </div>
+
+</main>
+
+<script>
+  const BASE = "/grafana/d-solo/adhj9nx/red-de-sensores-esp32c3-y-nodemcuv3";
+  const PARAMS = "orgId=1&timezone=browser&__feature.dashboardScene=true";
+  const PANELS = { p7: "panel-7", p8: "panel-8", p4: "panel-4", p5: "panel-5", p3: "panel-3", p6: "panel-6" };
+
+  function buildUrl(panelId, from) {
+    return `${BASE}?${PARAMS}&panelId=${panelId}&from=${from}&to=now`;
+  }
+
+  function updatePanels() {
+    const from = document.getElementById("timeRange").value;
+    for (const [id, panelId] of Object.entries(PANELS)) {
+      document.getElementById(id).src = buildUrl(panelId, from);
+    }
+  }
+
+  updatePanels();
+</script>
+
+</body>
+</html>
