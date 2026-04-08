@@ -10,3 +10,4 @@ El sistema utiliza temporalmente microcontroladores *NodeMCU V3* y *ESP32-C3 Sup
 ## CONTENIDO DEL REPOSITORIO
 * **/DOCUMENTOS-SENSORES:** Archivos en *PDF* y en *WORD* en donde se redactan mis actividades realizadas durante el desarrollo del proyecto, tales como investigaciones, documentaciones, diseños, etc.
 * **/PROGRAMAS-SENSORES:** Archivos en *ARDUINO* que he realizado para las pruebas de los sensores y microcontroladores.
+* **/REPORTES-SENSORES:** Archivos en *PYTHON* junto con los recursos necesarios que he realizado para la creación de un Chatbot en Telegram.
