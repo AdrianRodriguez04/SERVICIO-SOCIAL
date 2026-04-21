@@ -15,7 +15,6 @@ log = logging.getLogger(__name__)
 RUTA_HTML = os.path.join("recursos", "dashboard.html")
 TOKEN_EXPIRACION = 600   # 10 minutos
 
-# ⚠️ Cambia esto por tu URL de ngrok (la que aparece en "Forwarding")
 DOMINIO_PUBLICO = "https://nonmutually-feisty-eilene.ngrok-free.dev"
 
 
@@ -28,7 +27,6 @@ def _obtener_ip_local() -> str:
         return ip
     except Exception:
         return "127.0.0.1"
-
 
 class ServidorDashboard:
 
