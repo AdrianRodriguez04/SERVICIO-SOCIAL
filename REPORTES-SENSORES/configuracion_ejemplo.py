@@ -23,6 +23,7 @@ SENSORES = {
         "label_microcontrolador":   "nodemcu_v3",
         "metrica_temp": "dht22_temperatura",
         "metrica_hum":  "dht22_humedad",
+        "coordenadas": (77, 431, 72),
     },
     "dht22_nodemcuv3_n2": {
         "job":          "dht22_nodemcu_v3_n2",
@@ -32,6 +33,7 @@ SENSORES = {
         "label_microcontrolador":   "nodemcu_v3",
         "metrica_temp": "dht22_temperatura",
         "metrica_hum":  "dht22_humedad",
+        "coordenadas": (627, 206, 124),
     },
     "dht22_esp32c3_n1": {
         "job":          "dht22_esp32c3_n1",
@@ -41,6 +43,7 @@ SENSORES = {
         "label_microcontrolador":   "esp32_c3",
         "metrica_temp": "dht22_temperatura",
         "metrica_hum":  "dht22_humedad",
+        "coordenadas": (747, 1, 30),
     },
     "dht22_esp32c3_n2": {
         "job":          "dht22_esp32c3_n2",
@@ -50,6 +53,7 @@ SENSORES = {
         "label_microcontrolador":   "esp32_c3",
         "metrica_temp": "dht22_temperatura",
         "metrica_hum":  "dht22_humedad",
+        "coordenadas": (1, 270, 33),
     },
     "dht22_esp32c3_n3": {
         "job":          "dht22_esp32c3_n3",
@@ -59,6 +63,7 @@ SENSORES = {
         "label_microcontrolador":   "esp32_c3",
         "metrica_temp": "dht22_temperatura",
         "metrica_hum":  "dht22_humedad",
+        "coordenadas": (815, 440, 113),
     },
     "dht22_esp32c3_n4": {
         "job":          "dht22_esp32c3_n4",
@@ -68,6 +73,7 @@ SENSORES = {
         "label_microcontrolador":   "esp32_c3",
         "metrica_temp": "dht22_temperatura",
         "metrica_hum":  "dht22_humedad",
+        "coordenadas": (924, 8, 33),
     },
 }
 
@@ -79,6 +85,6 @@ ZONA_HORARIA    = "America/Mexico_City"
 # Umbrales de alertas
 ALERTA_TEMP_MAX  = 30.0
 ALERTA_TEMP_MIN  = 10.0
-ALERTA_HUM_MAX   = 60.0
+ALERTA_HUM_MAX   = 65.0
 ALERTA_HUM_MIN   = 15.0
 ALERTAS_ACTIVAS  = True

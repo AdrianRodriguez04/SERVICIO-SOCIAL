@@ -62,17 +62,12 @@ COLOR_GRID        = "#2C3038"   # líneas de cuadrícula
 COLOR_TEXTO       = "#D8D9DA"   # etiquetas y títulos
 COLOR_TICK        = "#9FA3A9"   # marcas del eje
 
-
-# ----------------------------------------------------------------
 # Helpers internos
-# ----------------------------------------------------------------
-
 def _nombres_validos(sensores: list[str] | None) -> list[str]:
     """Devuelve la lista de nombres de sensores a procesar."""
     if sensores is None:
         return list(SENSORES.keys())
     return [n for n in sensores if n in SENSORES]
-
 
 def _a_local_naive(timestamps: list) -> list:
     """
@@ -89,7 +84,6 @@ def _a_local_naive(timestamps: list) -> list:
         else:
             resultado.append(t)
     return resultado
-
 
 def _formato_eje_x(ax, minutos: int):
     """Configura el formateador del eje X según la duración del lapso."""
@@ -116,7 +110,6 @@ def _formato_eje_x(ax, minutos: int):
     plt.setp(ax.xaxis.get_majorticklabels(),
              rotation=30, ha="right", fontsize=9, color=COLOR_TICK)
 
-
 def _estilo_ejes(ax, ylabel: str, ymin: float, ymax: float,
                  ytick_step: int, minutos: int):
     """Aplica el estilo visual oscuro tipo Grafana a un eje."""
@@ -138,7 +131,6 @@ def _estilo_ejes(ax, ylabel: str, ymin: float, ymax: float,
         spine.set_edgecolor(COLOR_GRID)
 
     _formato_eje_x(ax, minutos)
-
 
 def _grafica_un_sensor(nombre: str, actual: dict, historial: dict,
                        etiqueta: str, minutos: int, ts_str: str) -> io.BytesIO:
@@ -164,7 +156,7 @@ def _grafica_un_sensor(nombre: str, actual: dict, historial: dict,
         color=COLOR_TEXTO, y=0.98,
     )
 
-    # ---- Temperatura ----
+    # Temperatura
     tt = _a_local_naive(hist.get("tiempos_temp", []))
     tv = hist.get("valores_temp", [])
 
@@ -211,7 +203,7 @@ def _grafica_un_sensor(nombre: str, actual: dict, historial: dict,
                 facecolor="#2C3038", edgecolor=COLOR_GRID,
                 labelcolor=COLOR_TEXTO)
 
-    # ---- Humedad ----
+    # Humedad
     ht = _a_local_naive(hist.get("tiempos_hum", []))
     hv = hist.get("valores_hum", [])
 
@@ -264,11 +256,7 @@ def _grafica_un_sensor(nombre: str, actual: dict, historial: dict,
     buf.seek(0)
     return buf
 
-
-# ----------------------------------------------------------------
 # PNG — una imagen por sensor
-# ----------------------------------------------------------------
-
 def generar_imagenes_graficas(actual: dict, historial: dict,
                               sensores: list[str] | None = None
                               ) -> list[tuple[str, io.BytesIO]]:
@@ -289,11 +277,7 @@ def generar_imagenes_graficas(actual: dict, historial: dict,
         for nombre in nombres
     ]
 
-
-# ----------------------------------------------------------------
 # PDF — gráfica de cada sensor en su propia sección
-# ----------------------------------------------------------------
-
 def generar_reporte_pdf(actual: dict, historial: dict,
                         sensores: list[str] | None = None) -> io.BytesIO:
     """
@@ -538,17 +522,13 @@ def generar_reporte_pdf(actual: dict, historial: dict,
         os.unlink(ruta)
     return buf_pdf
 
-
-# ----------------------------------------------------------------
 # CSV
-# ----------------------------------------------------------------
-
 def generar_csv(actual: dict, historial: dict,
                 sensores: list[str] | None = None) -> tuple[io.BytesIO, str]:
     """
     Genera un CSV con todos los registros del lapso y sensores indicados.
     Devuelve (BytesIO listo para Telegram, nombre_de_archivo).
-    Columnas: sensor, tipo, timestamp, valor
+    Columnas: sensor, tipo, timestamp, valor, coordenadas.
     """
     nombres    = _nombres_validos(sensores)
     tz         = pytz.timezone(ZONA_HORARIA)
@@ -563,11 +543,17 @@ def generar_csv(actual: dict, historial: dict,
         "# Generado: " + ahora.strftime("%d/%m/%Y %H:%M:%S"),
         "# Periodo:  " + etiqueta,
         "# Sensores: " + ", ".join(nombres),
-        "sensor,tipo,timestamp,valor",
+        "sensor,tipo,timestamp,valor,coordenadas(cm)",
     ]
 
     for nombre in nombres:
         hist = historial.get(nombre, {})
+        coordenadas_dic = SENSORES[nombre].get("coordenadas")
+        if coordenadas_dic is not None:
+            coordenadas = f"({coordenadas_dic[0]},{coordenadas_dic[1]},{coordenadas_dic[2]})"
+        else:
+            coordenadas = "N/D"
+
         for clave_t, clave_v, tipo in [
             ("tiempos_temp", "valores_temp", "temperatura_C"),
             ("tiempos_hum",  "valores_hum",  "humedad_pct"),
@@ -579,7 +565,8 @@ def generar_csv(actual: dict, historial: dict,
                     f'"{nombre}",'
                     + tipo + ","
                     + t.strftime("%Y-%m-%d %H:%M:%S") + ","
-                    + f"{v:.4f}"
+                    + f"{v:.4f}" + ","
+                    + f'"{coordenadas}"'
                 )
 
     sufijo = "todos" if len(nombres) > 1 else nombres[0].lower().replace(" ", "_")

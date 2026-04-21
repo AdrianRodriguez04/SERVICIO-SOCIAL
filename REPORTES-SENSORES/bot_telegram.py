@@ -71,9 +71,7 @@ _servidor_dashboard = ServidorDashboard(puerto=8765)
 
 alertas_activas = ALERTAS_ACTIVAS
 
-# ----------------------------------------------------------------
 # Estado de conversación por usuario
-# ----------------------------------------------------------------
 _estado_usuario: dict[int, dict] = {}
 
 # Prefijos callback
@@ -123,17 +121,12 @@ _ETIQ_PLURAL = {
     "y":  "años",
 }
 
-
 def _sensor_por_idx(idx: int) -> list[str]:
     if idx == TODOS_IDX:
         return _SENSORES_LISTA
     return [_SENSORES_LISTA[idx]]
 
-
-# ----------------------------------------------------------------
 # Teclados inline
-# ----------------------------------------------------------------
-
 def _teclado_sensores(tipo: str) -> InlineKeyboardMarkup:
     """Teclado de selección de sensor. callback_data = "sen:TIPO|IDX" """
     botones = []
@@ -146,7 +139,6 @@ def _teclado_sensores(tipo: str) -> InlineKeyboardMarkup:
         callback_data=f"{PRE_SENSOR}{tipo}|{TODOS_IDX}"
     )])
     return InlineKeyboardMarkup(botones)
-
 
 def _teclado_unidades(tipo: str, minutos_disponibles: int) -> InlineKeyboardMarkup | None:
     """
@@ -169,7 +161,6 @@ def _teclado_unidades(tipo: str, minutos_disponibles: int) -> InlineKeyboardMark
     if fila:
         botones.append(fila)
     return InlineKeyboardMarkup(botones) if botones else None
-
 
 def _teclado_cantidades(tipo: str, unidad: str,
                          minutos_disponibles: int) -> InlineKeyboardMarkup | None:
@@ -203,16 +194,11 @@ def _teclado_cantidades(tipo: str, unidad: str,
         botones.append(fila)
     return InlineKeyboardMarkup(botones)
 
-
-# ----------------------------------------------------------------
 # Helpers de envío
-# ----------------------------------------------------------------
-
 def _fmt(valor, unidad="", decimales=1) -> str:
     if valor is None:
         return "Sin datos"
     return f"{valor:.{decimales}f}{unidad}"
-
 
 def _emoji_estado(temp, hum) -> str:
     if temp is None or hum is None:
@@ -222,7 +208,6 @@ def _emoji_estado(temp, hum) -> str:
     if temp < ALERTA_TEMP_MIN or hum < ALERTA_HUM_MIN:
         return "🔵"
     return "🟢"
-
 
 async def _enviar_estado_texto(app, chat_id):
     actual = obtener_lecturas_actuales()
@@ -241,7 +226,6 @@ async def _enviar_estado_texto(app, chat_id):
     await app.bot.send_message(
         chat_id=chat_id, text="\n".join(lineas), parse_mode="Markdown"
     )
-
 
 async def _generar_y_enviar(app, chat_id: int, tipo: str,
                              minutos: int, nombres_sensores: list[str]):
@@ -278,10 +262,9 @@ async def _generar_y_enviar(app, chat_id: int, tipo: str,
             caption=(
                 f"📋 CSV DHT22 — {etiqueta}\n"
                 f"🕐 {ts_cap}\n"
-                "Columnas: sensor, tipo, timestamp, valor"
+                "Columnas: sensor, tipo, timestamp, valor, coordenadas(cm)"
             ),
         )
-
 
 async def _verificar_alertas(app):
     if not alertas_activas:
@@ -309,11 +292,7 @@ async def _verificar_alertas(app):
                 parse_mode="Markdown",
             )
 
-
-# ----------------------------------------------------------------
 # Handlers de comandos
-# ----------------------------------------------------------------
-
 async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     texto = (
         "👋 *Bot de Monitoreo DHT22*\n\n"
@@ -331,11 +310,9 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     )
     await update.message.reply_text(texto, parse_mode="MarkdownV2")
 
-
 async def cmd_estado(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("⏳ Consultando sensores, por favor espere...")
     await _enviar_estado_texto(ctx.application, update.effective_chat.id)
-
 
 async def _iniciar_flujo(update: Update, tipo: str):
     """Paso 1: pregunta el sensor."""
@@ -346,7 +323,6 @@ async def _iniciar_flujo(update: Update, tipo: str):
         reply_markup=_teclado_sensores(tipo),
     )
 
-
 async def cmd_grafica(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await _iniciar_flujo(update, "g")
 
@@ -355,7 +331,6 @@ async def cmd_reporte(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 async def cmd_csv(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await _iniciar_flujo(update, "c")
-
 
 async def cmd_alertas(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     global alertas_activas
@@ -366,8 +341,6 @@ async def cmd_alertas(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 async def cmd_ayuda(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await cmd_start(update, ctx)
-
-
 
 async def cmd_dashboard(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     """
@@ -402,11 +375,7 @@ async def cmd_plan(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             parse_mode="Markdown",
         )
 
-
-# ----------------------------------------------------------------
 # Callbacks de botones inline
-# ----------------------------------------------------------------
-
 async def callback_sensor(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     """Paso 2: usuario eligió sensor → consultar disponibilidad → pedir unidad."""
     query = update.callback_query
@@ -470,7 +439,6 @@ async def callback_sensor(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         reply_markup=teclado,
     )
 
-
 async def callback_unidad(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     """Paso 3: usuario eligió unidad → mostrar botones de cantidad disponibles."""
     query = update.callback_query
@@ -505,7 +473,6 @@ async def callback_unidad(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown",
         reply_markup=teclado,
     )
-
 
 async def callback_cantidad(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     """Paso 4: usuario eligió cantidad → generar y enviar archivo."""
@@ -558,7 +525,6 @@ async def callback_cantidad(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         ]]),
     )
 
-
 async def callback_reiniciar(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     """Reinicia el flujo desde el paso de selección de sensor."""
     query = update.callback_query
@@ -571,22 +537,14 @@ async def callback_reiniciar(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         reply_markup=_teclado_sensores(tipo),
     )
 
-
-# ----------------------------------------------------------------
 # Tarea periódica: verificación de alertas
-# ----------------------------------------------------------------
-
 async def verificacion_alertas(app: Application):
     try:
         await _verificar_alertas(app)
     except Exception as e:
         log.error(f"Error en verificación de alertas: {e}")
 
-
-# ----------------------------------------------------------------
 # Main
-# ----------------------------------------------------------------
-
 def main():
     app = Application.builder().token(TELEGRAM_TOKEN).build()
 
@@ -606,8 +564,6 @@ def main():
     app.add_handler(CallbackQueryHandler(callback_unidad,   pattern=f"^{PRE_UNIDAD}"))
     app.add_handler(CallbackQueryHandler(callback_cantidad, pattern=f"^{PRE_CANTIDAD}"))
     app.add_handler(CallbackQueryHandler(callback_reiniciar, pattern=r"^reiniciar:"))
-
-    # Sin MessageHandler de texto: ya no se pide número al usuario
 
     async def post_init(application: Application):
         await _servidor_dashboard.iniciar()
@@ -638,7 +594,6 @@ def main():
     scheduler.start()
     log.info("Bot iniciado. Alertas activas cada 5 min.")
     app.run_polling(drop_pending_updates=True)
-
 
 if __name__ == "__main__":
     main()
