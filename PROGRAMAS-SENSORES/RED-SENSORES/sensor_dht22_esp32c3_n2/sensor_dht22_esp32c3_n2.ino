@@ -9,6 +9,16 @@
 #define WIFI_TIMEOUT  20000
 #define DHT_INTERVALO 3000
 
+// PIN LED DE ALERTA
+// GPIO10
+#define PIN_LED_ALERTA 10
+
+// UMBRALES DE ALERTA
+#define ALERTA_TEMP_MAX  30.0
+#define ALERTA_TEMP_MIN  10.0
+#define ALERTA_HUM_MAX   65.0
+#define ALERTA_HUM_MIN   15.0
+
 DHT sensorTH(PIN_DATOS, DHT_VERSION);
 
 const char* ssid     = "WDGTIC";
@@ -21,6 +31,21 @@ float         ultimaHumedad  = NAN;
 bool          lecturaValida  = false;
 unsigned long ultimaLectura  = 0;
 bool          servidorActivo = false;
+bool          estadoAlerta   = false;
+
+// Verificar umbrales y controlar LED
+
+void verificarAlertas() {
+
+  if (!lecturaValida) return;
+
+  bool alertaTemp = (ultimaTemp    > ALERTA_TEMP_MAX || ultimaTemp    < ALERTA_TEMP_MIN);
+  bool alertaHum  = (ultimaHumedad > ALERTA_HUM_MAX  || ultimaHumedad < ALERTA_HUM_MIN);
+
+  estadoAlerta = alertaTemp || alertaHum;
+
+   digitalWrite(PIN_LED_ALERTA, estadoAlerta ? HIGH : LOW);  
+}
 
 void handleMetrics() {
   if (!lecturaValida) {
@@ -39,7 +64,11 @@ void handleMetrics() {
 }
 
 void handleRoot() {
-  char html[512];
+
+  const char* colorAlerta = estadoAlerta ? "#e74c3c" : "#27ae60";
+  const char* textoAlerta = estadoAlerta ? "&#9888; ALERTA" : "&#10003; Normal";
+
+  char html[768];
   snprintf(html, sizeof(html),
     "<!DOCTYPE HTML><html><head>"
     "<meta charset='UTF-8'>"
@@ -50,9 +79,12 @@ void handleRoot() {
     "<p style='font-size:1.5em;'>Temp: <b>%.1f &deg;C</b></p>"
     "<p style='font-size:1.5em;'>Humedad: <b>%.1f %%</b></p>"
     "<p>RSSI: %d dBm</p>"
+    "<p style='font-size:1.4em;background:%s;color:white;padding:8px;border-radius:6px;'>"
+    "<b>%s</b></p>"
     "<hr><p><a href='/metrics'>Ir a /metrics</a></p>"
     "</body></html>",
-    ultimaTemp, ultimaHumedad, WiFi.RSSI()
+    ultimaTemp, ultimaHumedad, WiFi.RSSI(),
+    colorAlerta, textoAlerta
   );
   server.send(200, "text/html", html);
 }
@@ -93,6 +125,9 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
 
+  pinMode(PIN_LED_ALERTA, OUTPUT);
+  digitalWrite(PIN_LED_ALERTA, LOW); 
+
   sensorTH.begin();
   delay(2000);
 
@@ -102,6 +137,12 @@ void setup() {
   WiFi.setTxPower(WIFI_POWER_11dBm);
 
   conectarWiFi();
+
+  Serial.println("\nUmbrales configurados:");
+  Serial.print("  Temp MAX: "); Serial.println(ALERTA_TEMP_MAX);
+  Serial.print("  Temp MIN: "); Serial.println(ALERTA_TEMP_MIN);
+  Serial.print("  Hum  MAX: "); Serial.println(ALERTA_HUM_MAX);
+  Serial.print("  Hum  MIN: "); Serial.println(ALERTA_HUM_MIN);
 }
 
 void loop() {
@@ -122,8 +163,9 @@ void loop() {
       ultimaTemp    = t;
       ultimaHumedad = h;
       lecturaValida = true;
-      Serial.printf("[DHT] T=%.1fC  H=%.1f%%  RSSI=%ddBm\n",
-                    t, h, WiFi.RSSI());
+      verificarAlertas();
+      Serial.printf("[DHT] T=%.1fC  H=%.1f%%  RSSI=%ddBm  Alerta=%s\n",
+                    t, h, WiFi.RSSI(), estadoAlerta ? "SI" : "NO");
     } else {
       Serial.println("[DHT] Lectura invalida");
     }
