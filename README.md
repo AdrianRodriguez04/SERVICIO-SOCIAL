@@ -169,7 +169,7 @@ A lo largo del Servicio Social se documentaron las siguientes etapas:
 3. **Implementación de hardware** — Conexión y prueba de sensores con microcontroladores
 4. **Desarrollo de firmware** — Programación de los sketches en Arduino
 5. **Integración de monitoreo** — Configuración de Prometheus y Grafana
-6. **Desarrollo del Chatbot** — Creación del bot de Telegram en Python para alertas
+6. **Desarrollo del Chatbot** — Creación del bot de Telegram en Python para reportes y alertas
 
 ---
 
