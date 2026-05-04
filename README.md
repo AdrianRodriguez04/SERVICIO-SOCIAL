@@ -6,12 +6,12 @@
 
 <div align="center">
 
-![Estado](https://img.shields.io/badge/Estado-En%20Desarrollo-yellow?style=for-the-badge)
+![Estado](https://img.shields.io/badge/Estado-%20Finalizado-green?style=for-the-badge)
 ![Institución](https://img.shields.io/badge/UNAM-DGTIC-blue?style=for-the-badge)
 ![Lenguajes](https://img.shields.io/badge/C%2B%2B%20%7C%20Python%20%7C%20HTML-informational?style=for-the-badge)
 ![Licencia](https://img.shields.io/badge/Licencia-Académica-green?style=for-the-badge)
 
-**Monitoreo en tiempo real de temperatura y humedad en el área de Supercomputo**
+**Monitoreo en tiempo real de temperatura y humedad en el área de Supercómputo**
 
 </div>
 
@@ -27,7 +27,7 @@
 |---|---|
 | **Alumno** | Rodríguez Pichardo Adrián Leonardo |
 | **Asesor** | Dr. José Alberto Aparicio Santos |
-| **Área** | Supercomputo — DGTIC, UNAM |
+| **Área** | Supercómputo — DGTIC, UNAM |
 | **Modalidad** | Servicio Social |
 
 ---
@@ -38,7 +38,7 @@
 
 </div>
 
-Este repositorio documenta el desarrollo de un **sistema de monitoreo ambiental distribuido** implementado durante el Servicio Social en el área de Supercomputo de la DGTIC. El objetivo principal es supervisar de forma continua las condiciones de temperatura y humedad del centro de datos, generando alertas automáticas ante variaciones críticas que puedan comprometer la infraestructura.
+Este repositorio documenta el desarrollo de un **sistema de monitoreo ambiental distribuido** implementado durante el Servicio Social en el área de Supercómputo de la DGTIC. El objetivo principal fue supervisar de forma continua las condiciones de temperatura y humedad del área correspondiente, generando alertas y reportes automáticos que sirvan para el análisis de datos.
 
 ---
 
@@ -52,13 +52,13 @@ Este repositorio documenta el desarrollo de un **sistema de monitoreo ambiental 
 ┌────────────────────────────────────────────────────────────────────┐
 │                        FLUJO DE DATOS                              │
 │                                                                    │
-│   ┌─────────────┐    HTTP     ┌────────────┐    Query    ┌───────┐ │
+│   ┌─────────────┐    HTTP     ┌────────────┐    Querys   ┌───────┐ │
 │   │  NodeMCU V3 │ ──────────► │            │ ──────────► │       │ │
 │   │  + DHT22    │             │ Prometheus │             │       │ │
 │   └─────────────┘             │ (Scraping) │             │Grafana│ │
 │                               │            │             │       │ │
 │   ┌─────────────┐    HTTP     │            │ ──────────► │       │ │
-│   │ ESP32-C3    │ ──────────► │            │  Alertas    │       │ │
+│   │ ESP32-C3    │ ──────────► │            │             │       │ │
 │   │ Super Mini  │             └────────────┘             └──┬────┘ │
 │   │  + DHT22    │                                           │      │
 │   └─────────────┘                                     ┌────▼───┐   │
@@ -79,7 +79,7 @@ Este repositorio documenta el desarrollo de un **sistema de monitoreo ambiental 
 | **Recolección** | NodeMCU V3 / ESP32-C3 Super Mini + DHT22 | Exposers de métricas vía HTTP |
 | **Almacenamiento** | Prometheus | Scraping y almacenamiento de series de tiempo |
 | **Visualización** | Grafana | Dashboards en tiempo real |
-| **Alertamiento** | Grafana + Bot de Telegram | Notificaciones ante umbrales críticos |
+| **Reporte y Alertamiento** | Bot de Telegram | Notificaciones ante umbrales críticos y generación de reportes |
 
 ---
 
@@ -119,7 +119,7 @@ SERVICIO-SOCIAL/
 │
 ├── 📂 REPORTES-SENSORES/
 │   └── Scripts en Python y recursos para el Chatbot de Telegram,
-│       incluyendo integración con la API de alertas.
+│       incluyendo integración con la API de Prometheus.
 │
 └── 📄 README.md
 ```
@@ -152,6 +152,7 @@ SERVICIO-SOCIAL/
 - Dashboards interactivos en tiempo real con Grafana
 - Sistema de alertas configurables por umbrales de temperatura
 - Notificaciones automáticas vía Bot de Telegram
+- Generación de reportes pdf, csv y png vía Bot de Telegram
 
 ---
 
@@ -161,7 +162,7 @@ SERVICIO-SOCIAL/
 
 </div>
 
-A lo largo del Servicio Social se han documentado las siguientes etapas:
+A lo largo del Servicio Social se documentaron las siguientes etapas:
 
 1. **Investigación** — Estudio de protocolos IoT, Prometheus y Grafana
 2. **Diseño** — Arquitectura de la red de sensores y flujo de datos
@@ -178,7 +179,7 @@ A lo largo del Servicio Social se han documentado las siguientes etapas:
 
 </div>
 
-Este proyecto se realiza en el marco del Servicio Social universitario dentro de la **Dirección General de Cómputo y de Tecnologías de Información y Comunicación (DGTIC)** de la **Universidad Nacional Autónoma de México (UNAM)**, específicamente en el área de **Supercomputo**.
+Este proyecto se realizó en el marco del Servicio Social universitario dentro de la **Dirección General de Cómputo y de Tecnologías de Información y Comunicación (DGTIC)** de la **Universidad Nacional Autónoma de México (UNAM)**, específicamente en el área de **Supercomputo**.
 
 ---
 
