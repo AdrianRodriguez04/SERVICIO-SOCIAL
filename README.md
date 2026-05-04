@@ -17,7 +17,11 @@
 
 ---
 
+<div align="center">
+
 ## Información General
+
+</div>
 
 | Campo | Detalle |
 |---|---|
@@ -28,13 +32,21 @@
 
 ---
 
+<div align="center">
+
 ## Descripción del Proyecto
+
+</div>
 
 Este repositorio documenta el desarrollo de un **sistema de monitoreo ambiental distribuido** implementado durante el Servicio Social en el área de Supercomputo de la DGTIC. El objetivo principal es supervisar de forma continua las condiciones de temperatura y humedad del centro de datos, generando alertas automáticas ante variaciones críticas que puedan comprometer la infraestructura.
 
 ---
 
+<div align="center">
+
 ## Arquitectura del Sistema
+
+</div>
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
@@ -56,7 +68,11 @@ Este repositorio documenta el desarrollo de un **sistema de monitoreo ambiental 
 └────────────────────────────────────────────────────────────────────┘
 ```
 
+<div align="center">
+
 ### Componentes del Stack
+
+</div>
 
 | Capa | Tecnología | Función |
 |---|---|---|
@@ -67,7 +83,11 @@ Este repositorio documenta el desarrollo de un **sistema de monitoreo ambiental 
 
 ---
 
+<div align="center">
+
 ## Hardware Utilizado
+
+</div>
 
 ### Microcontroladores
 
@@ -80,7 +100,11 @@ Este repositorio documenta el desarrollo de un **sistema de monitoreo ambiental 
 
 ---
 
+<div align="center">
+
 ## Estructura del Repositorio
+
+</div>
 
 ```
 SERVICIO-SOCIAL/
@@ -102,7 +126,11 @@ SERVICIO-SOCIAL/
 
 ---
 
+<div align="center">
+
 ## Tecnologías y Lenguajes
+
+</div>
 
 ![C++](https://img.shields.io/badge/C%2B%2B-Arduino-00599C?style=flat-square&logo=cplusplus)
 ![Python](https://img.shields.io/badge/Python-Telegram%20Bot-3776AB?style=flat-square&logo=python)
@@ -112,7 +140,11 @@ SERVICIO-SOCIAL/
 
 ---
 
+<div align="center">
+
 ## Funcionalidades del Sistema
+
+</div>
 
 - Lectura continua de temperatura y humedad con sensores DHT22
 - Exposición de métricas en formato compatible con Prometheus vía HTTP
@@ -123,7 +155,11 @@ SERVICIO-SOCIAL/
 
 ---
 
+<div align="center">
+
 ## Actividades Realizadas
+
+</div>
 
 A lo largo del Servicio Social se han documentado las siguientes etapas:
 
@@ -136,7 +172,11 @@ A lo largo del Servicio Social se han documentado las siguientes etapas:
 
 ---
 
+<div align="center">
+
 ## Institución
+
+</div>
 
 Este proyecto se realiza en el marco del Servicio Social universitario dentro de la **Dirección General de Cómputo y de Tecnologías de Información y Comunicación (DGTIC)** de la **Universidad Nacional Autónoma de México (UNAM)**, específicamente en el área de **Supercomputo**.
 
