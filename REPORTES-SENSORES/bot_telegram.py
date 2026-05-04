@@ -59,6 +59,7 @@ from cliente_prometheus import (
     UNIDADES, MINUTOS_POR_UNIDAD,
 )
 from generador_reportes import generar_imagenes_graficas, generar_reporte_pdf, generar_csv
+from historial_alertas import registrar_alerta, exportar_csv_alertas, total_alertas
 
 logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -277,13 +278,17 @@ async def _verificar_alertas(app):
         msgs = []
         if tmp is not None:
             if tmp > ALERTA_TEMP_MAX:
+                registrar_alerta(nombre, "temperatura", "alto", tmp, ALERTA_TEMP_MAX)
                 msgs.append(f"🔴 Temperatura alta: `{tmp:.1f}°C` (máx {ALERTA_TEMP_MAX}°C)")
             elif tmp < ALERTA_TEMP_MIN:
+                registrar_alerta(nombre, "temperatura", "bajo", tmp, ALERTA_TEMP_MIN)
                 msgs.append(f"🔵 Temperatura baja: `{tmp:.1f}°C` (mín {ALERTA_TEMP_MIN}°C)")
         if hum is not None:
             if hum > ALERTA_HUM_MAX:
+                registrar_alerta(nombre, "humedad", "alto", hum, ALERTA_HUM_MAX)
                 msgs.append(f"🔴 Humedad alta: `{hum:.1f}%` (máx {ALERTA_HUM_MAX}%)")
             elif hum < ALERTA_HUM_MIN:
+                registrar_alerta(nombre, "humedad", "bajo", hum, ALERTA_HUM_MIN)
                 msgs.append(f"🔵 Humedad baja: `{hum:.1f}%` (mín {ALERTA_HUM_MIN}%)")
         if msgs:
             await app.bot.send_message(
@@ -306,6 +311,7 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         "• /dashboard — Dashboard de Grafana \(enlace temporal\)\n"
         "• /plan    — Plano de distribución de los sensores\n"
         "• /alerts  — Activar o desactivar alertas automáticas\n"
+        "• /history — Exportar historial de alertas como CSV\n"
         "• /help    — Mostrar esta ayuda\n"
     )
     await update.message.reply_text(texto, parse_mode="MarkdownV2")
@@ -341,6 +347,38 @@ async def cmd_alertas(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 async def cmd_ayuda(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await cmd_start(update, ctx)
+async def cmd_history(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """Envía el historial de alertas de la sesión como archivo CSV."""
+    n = total_alertas()
+    if n == 0:
+        await update.message.reply_text(
+            "\U0001f4ed No se han registrado alertas en esta sesión."
+        )
+        return
+
+    await update.message.reply_text("\u23f3 Generando historial de alertas, por favor espere...")
+
+    try:
+        buf, nombre_archivo = exportar_csv_alertas()
+        tz  = pytz.timezone(ZONA_HORARIA)
+        ts_cap = datetime.now(tz).strftime("%d/%m/%Y %H:%M:%S")
+        await update.message.reply_document(
+            document=buf,
+            filename=nombre_archivo,
+            caption=(
+                "\U0001f4cb *Historial de Alertas DHT22*\n"
+                f"\U0001f550 Generado: {ts_cap}\n"
+                f"Total de alertas registradas: `{n}`\n"
+                "Columnas: timestamp, sensor, coordenadas(cm), tipo, estado, valor, limite"
+            ),
+            parse_mode="Markdown",
+        )
+    except Exception as e:
+        log.error(f"Error generando historial de alertas: {e}")
+        await update.message.reply_text(
+            "\u274c Ocurrió un error al generar el historial. Por favor intente nuevamente."
+        )
+
 
 async def cmd_dashboard(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     """
@@ -556,8 +594,9 @@ def main():
     app.add_handler(CommandHandler("csv",    cmd_csv))
     app.add_handler(CommandHandler("dashboard", cmd_dashboard))
     app.add_handler(CommandHandler("plan",   cmd_plan))
-    app.add_handler(CommandHandler("alerts", cmd_alertas))
-    app.add_handler(CommandHandler("help",   cmd_ayuda))
+    app.add_handler(CommandHandler("alerts",    cmd_alertas))
+    app.add_handler(CommandHandler("history",  cmd_history))
+    app.add_handler(CommandHandler("help",     cmd_ayuda))
 
     # Botones inline — orden importa
     app.add_handler(CallbackQueryHandler(callback_sensor,   pattern=f"^{PRE_SENSOR}"))
@@ -574,8 +613,9 @@ def main():
             BotCommand("csv",     "Exportar datos en CSV — seleccione sensor y periodo"),
             BotCommand("dashboard", "Dashboard de Grafana (enlace de acceso temporal)"),
             BotCommand("plan",    "Plano de distribución de los sensores"),
-            BotCommand("alerts",  "Activar o desactivar alertas automáticas"),
-            BotCommand("help",    "Mostrar comandos disponibles"),
+            BotCommand("alerts",    "Activar o desactivar alertas automáticas"),
+            BotCommand("history",  "Exportar historial de alertas como CSV"),
+            BotCommand("help",     "Mostrar comandos disponibles"),
         ])
 
     async def post_shutdown(application: Application):
